@@ -5,6 +5,7 @@ import StatPanel from '../Components/StatPanel';
 import MoveSearch from '../Components/MoveSearch';
 import ConditionsPanel from '../Components/ConditionsPanel';
 import DamageResult from '../Components/DamageResult';
+import KoListPanel from '../Components/KoListPanel';
 import { calculateDamage } from '../utils/damage';
 
 const DEFAULT_IVS = { hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31 };
@@ -132,19 +133,31 @@ export default function Calculator() {
                         <ConditionsPanel conditions={conditions} setConditions={setConditions} />
                     </div>
 
-                    {/* ───── Defender ───── */}
-                    <div className="bg-gray-900 border border-gray-700 rounded-2xl p-5 space-y-5">
-                        <div className="flex items-center gap-2 mb-1">
-                            <span className="w-2 h-2 rounded-full bg-blue-500 inline-block" />
-                            <h2 className="text-base font-bold text-white">Defender</h2>
+                    {/* ───── Defender + KO List ───── */}
+                    <div className="space-y-5">
+                        <div className="bg-gray-900 border border-gray-700 rounded-2xl p-5 space-y-5">
+                            <div className="flex items-center gap-2 mb-1">
+                                <span className="w-2 h-2 rounded-full bg-blue-500 inline-block" />
+                                <h2 className="text-base font-bold text-white">Defender</h2>
+                            </div>
+                            <PokemonSearch label="Pokémon" value={defender} onChange={setDefender} />
+                            <StatPanel
+                                pokemon={defender}
+                                level={defLevel} setLevel={setDefLevel}
+                                ivs={defIvs}    setIvs={setDefIvs}
+                                evs={defEvs}    setEvs={setDefEvs}
+                                nature={defNature} setNature={setDefNature}
+                            />
                         </div>
-                        <PokemonSearch label="Pokémon" value={defender} onChange={setDefender} />
-                        <StatPanel
-                            pokemon={defender}
-                            level={defLevel} setLevel={setDefLevel}
-                            ivs={defIvs}    setIvs={setDefIvs}
-                            evs={defEvs}    setEvs={setDefEvs}
-                            nature={defNature} setNature={setDefNature}
+
+                        <KoListPanel
+                            attacker={attacker}
+                            attackerIvs={atkIvs}
+                            attackerEvs={atkEvs}
+                            attackerNature={atkNature}
+                            attackerLevel={atkLevel}
+                            move={move}
+                            conditions={conditions}
                         />
                     </div>
 
