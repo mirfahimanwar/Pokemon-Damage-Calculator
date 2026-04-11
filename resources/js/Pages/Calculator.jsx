@@ -158,7 +158,12 @@ export default function Calculator() {
                             attackerLevel={atkLevel}
                             move={move}
                             conditions={conditions}
-                            onSelect={setDefender}
+                            onSelect={(pokemon, evs, ivs, nature) => {
+                                setDefender(pokemon);
+                                setDefEvs({ ...evs });
+                                setDefIvs({ ...ivs });
+                                setDefNature(nature);
+                            }}
                             selectedDefenderId={defender?.id}
                         />
                     </div>

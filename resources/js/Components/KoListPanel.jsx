@@ -147,6 +147,12 @@ export default function KoListPanel({
 
     const ready = attacker && move?.power;
 
+    // When clicking a row, apply the Pokemon AND the preset's spread so the
+    // damage panel matches what the KO list computed.
+    const handleSelect = onSelect
+        ? (pokemon) => onSelect(pokemon, preset.evs, DEF_IVS, preset.nature)
+        : null;
+
     return (
         <div className="bg-gray-900 border border-gray-700 rounded-2xl overflow-hidden">
             {/* Header */}
@@ -224,19 +230,19 @@ export default function KoListPanel({
                             title="Guaranteed 1HKO" emoji="✅"
                             colorClass="text-green-400"
                             items={groups.guaranteed} defaultOpen={true}
-                            onSelect={onSelect} selectedDefenderId={selectedDefenderId}
+                            onSelect={handleSelect} selectedDefenderId={selectedDefenderId}
                         />
                         <Section
                             title="Possible 1HKO" emoji="⚡"
                             colorClass="text-yellow-400"
                             items={groups.possible} defaultOpen={true}
-                            onSelect={onSelect} selectedDefenderId={selectedDefenderId}
+                            onSelect={handleSelect} selectedDefenderId={selectedDefenderId}
                         />
                         <Section
                             title="Cannot 1HKO" emoji="❌"
                             colorClass="text-gray-400"
                             items={groups.none} defaultOpen={false}
-                            onSelect={onSelect} selectedDefenderId={selectedDefenderId}
+                            onSelect={handleSelect} selectedDefenderId={selectedDefenderId}
                         />
                         {groups.guaranteed.length === 0 && groups.possible.length === 0 && groups.none.length === 0 && (
                             <div className="px-4 py-6 text-center text-gray-500 text-sm">
