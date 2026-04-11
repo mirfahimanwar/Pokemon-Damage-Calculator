@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import { calculateDamage } from '../utils/damage';
+import { isChampionsEligible } from '../utils/championsEligible';
 import TypeBadge from './TypeBadge';
 
 const DEF_IVS = { hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31 };
@@ -101,6 +102,7 @@ function Section({ title, emoji, colorClass, items, defaultOpen, onSelect, selec
 export default function KoListPanel({
     attacker, attackerIvs, attackerEvs, attackerNature, attackerLevel,
     attackerItem = null,
+    championsOnly = false,
     move, conditions, onSelect, selectedDefenderId,
 }) {
     const [allPokemon, setAllPokemon] = useState([]);
@@ -124,6 +126,7 @@ export default function KoListPanel({
         const q = filter.toLowerCase();
 
         for (const pokemon of allPokemon) {
+            if (championsOnly && !isChampionsEligible(pokemon.name)) continue;
             if (q && !pokemon.name.toLowerCase().includes(q)) continue;
             try {
                 const result = calculateDamage({
@@ -145,7 +148,7 @@ export default function KoListPanel({
 
         return { guaranteed, possible, none };
     }, [attacker, attackerIvs, attackerEvs, attackerNature, attackerLevel, attackerItem,
-        move, conditions, allPokemon, filter, preset]);
+        championsOnly, move, conditions, allPokemon, filter, preset]);
 
     const ready = attacker && move?.power;
 

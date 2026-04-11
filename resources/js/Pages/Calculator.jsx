@@ -43,6 +43,9 @@ export default function Calculator() {
     // Conditions
     const [conditions, setConditions]     = useState({ ...DEFAULT_CONDITIONS });
 
+    // Event filter
+    const [championsOnly, setChampionsOnly] = useState(false);
+
     // Compute result live
     const result = useMemo(() => {
         if (!attacker || !defender || !move || !move.power) return null;
@@ -90,7 +93,8 @@ export default function Calculator() {
                             <span className="w-2 h-2 rounded-full bg-red-500 inline-block" />
                             <h2 className="text-base font-bold text-white">Attacker</h2>
                         </div>
-                        <PokemonSearch label="Pokémon" value={attacker} onChange={setAttacker} />
+                        <PokemonSearch label="Pokémon" value={attacker} onChange={setAttacker}
+                            championsOnly={championsOnly} />
                         <StatPanel
                             pokemon={attacker}
                             level={atkLevel} setLevel={setAtkLevel}
@@ -136,6 +140,38 @@ export default function Calculator() {
                             </button>
                         </div>
 
+                        {/* Champions eligibility filter */}
+                        <label className={`flex items-center gap-3 px-4 py-3 rounded-xl border cursor-pointer transition select-none
+                                          ${ championsOnly
+                                              ? 'bg-yellow-950/60 border-yellow-500/70'
+                                              : 'bg-gray-800 border-gray-700 hover:border-yellow-600/50' }`}>
+                            <input
+                                type="checkbox"
+                                className="sr-only"
+                                checked={championsOnly}
+                                onChange={e => setChampionsOnly(e.target.checked)}
+                            />
+                            {/* Custom checkbox */}
+                            <div className={`w-5 h-5 rounded flex-shrink-0 flex items-center justify-center border-2 transition
+                                            ${ championsOnly
+                                                ? 'bg-yellow-500 border-yellow-400'
+                                                : 'border-gray-500 bg-gray-700' }`}>
+                                {championsOnly && (
+                                    <svg className="w-3 h-3 text-gray-900" fill="currentColor" viewBox="0 0 12 12">
+                                        <path d="M10 3L5 9 2 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+                                    </svg>
+                                )}
+                            </div>
+                            <div className="min-w-0">
+                                <div className={`text-sm font-semibold ${ championsOnly ? 'text-yellow-300' : 'text-gray-300' }`}>
+                                    🏆 Pokémon Champions Eligible
+                                </div>
+                                <div className="text-xs text-gray-500 truncate">
+                                    Limit to {championsOnly ? 'eligible Pokémon only' : 'all 1,025 Pokémon'}
+                                </div>
+                            </div>
+                        </label>
+
                         {/* Damage result */}
                         {result ? (
                             <DamageResult result={result} move={move} />
@@ -159,7 +195,8 @@ export default function Calculator() {
                                 <span className="w-2 h-2 rounded-full bg-blue-500 inline-block" />
                                 <h2 className="text-base font-bold text-white">Defender</h2>
                             </div>
-                            <PokemonSearch label="Pokémon" value={defender} onChange={setDefender} />
+                            <PokemonSearch label="Pokémon" value={defender} onChange={setDefender}
+                                championsOnly={championsOnly} />
                             <StatPanel
                                 pokemon={defender}
                                 level={defLevel} setLevel={setDefLevel}
@@ -185,6 +222,7 @@ export default function Calculator() {
                             attackerNature={atkNature}
                             attackerLevel={atkLevel}
                             attackerItem={attackerItem}
+                            championsOnly={championsOnly}
                             move={move}
                             conditions={conditions}
                             onSelect={(pokemon, evs, ivs, nature) => {

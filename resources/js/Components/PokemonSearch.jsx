@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import TypeBadge from './TypeBadge';
 import axios from 'axios';
+import { isChampionsEligible } from '../utils/championsEligible';
 
-export default function PokemonSearch({ label, value, onChange }) {
+export default function PokemonSearch({ label, value, onChange, championsOnly = false }) {
     const [query, setQuery]       = useState('');
     const [results, setResults]   = useState([]);
     const [open, setOpen]         = useState(false);
@@ -94,7 +95,7 @@ export default function PokemonSearch({ label, value, onChange }) {
                 </ul>
             )}
             {value && (
-                <div className="mt-3 flex items-center gap-3 p-3 bg-gray-800 border border-gray-700 rounded-lg">
+                <div className="mt-3 flex items-center gap-3 p-3 bg-gray-800 border border-gray-700 rounded-lg relative">
                     <img
                         src={value.image_url}
                         alt={value.name}
@@ -109,6 +110,14 @@ export default function PokemonSearch({ label, value, onChange }) {
                             {value.type2 && <TypeBadge type={value.type2} />}
                         </div>
                     </div>
+                    {championsOnly && !isChampionsEligible(value.name) && (
+                        <div className="absolute inset-0 rounded-lg bg-red-900/60 flex items-center justify-center">
+                            <span className="text-xs font-bold text-red-200 bg-red-800/90 px-2 py-1 rounded-md
+                                           border border-red-600 text-center leading-tight">
+                                Not Champions Eligible
+                            </span>
+                        </div>
+                    )}
                 </div>
             )}
         </div>
