@@ -4,7 +4,37 @@ import { calculateDamage } from '../utils/damage';
 import TypeBadge from './TypeBadge';
 
 const DEF_IVS = { hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31 };
-const DEF_EVS = { hp: 0,  atk: 0,  def: 0,  spa: 0,  spd: 0,  spe: 0  };
+
+const PRESETS = [
+    {
+        id: 'min',
+        label: 'Min Investment',
+        description: '0 EVs · Hardy',
+        evs: { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 },
+        nature: 'Hardy',
+    },
+    {
+        id: 'hp',
+        label: 'HP Invested',
+        description: '252 HP EVs · Hardy',
+        evs: { hp: 252, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 },
+        nature: 'Hardy',
+    },
+    {
+        id: 'phys',
+        label: 'Physical Wall',
+        description: '252 HP / 252 Def · Bold',
+        evs: { hp: 252, atk: 0, def: 252, spa: 0, spd: 0, spe: 4 },
+        nature: 'Bold',
+    },
+    {
+        id: 'spec',
+        label: 'Special Wall',
+        description: '252 HP / 252 SpD · Calm',
+        evs: { hp: 252, atk: 0, def: 0, spa: 0, spd: 252, spe: 4 },
+        nature: 'Calm',
+    },
+];
 
 function Row({ pokemon, result, onSelect, isSelected }) {
     return (
@@ -75,6 +105,9 @@ export default function KoListPanel({
     const [allPokemon, setAllPokemon] = useState([]);
     const [loading, setLoading]       = useState(true);
     const [filter, setFilter]         = useState('');
+    const [presetId, setPresetId]     = useState('min');
+
+    const preset = PRESETS.find(p => p.id === presetId);
 
     // Fetch all 1,025 Pokémon once
     useEffect(() => {
@@ -97,8 +130,8 @@ export default function KoListPanel({
                     attackerIvs, attackerEvs, attackerNature, attackerLevel,
                     defender: pokemon,
                     defenderIvs: DEF_IVS,
-                    defenderEvs: DEF_EVS,
-                    defenderNature: 'Hardy',
+                    defenderEvs: preset.evs,
+                    defenderNature: preset.nature,
                     defenderLevel: attackerLevel,
                     move, conditions,
                 });
@@ -110,7 +143,7 @@ export default function KoListPanel({
 
         return { guaranteed, possible, none };
     }, [attacker, attackerIvs, attackerEvs, attackerNature, attackerLevel,
-        move, conditions, allPokemon, filter]);
+        move, conditions, allPokemon, filter, preset]);
 
     const ready = attacker && move?.power;
 
@@ -121,10 +154,24 @@ export default function KoListPanel({
                 <h3 className="text-sm font-bold text-white flex items-center gap-2">
                     ⚔️ 1HKO Potential
                 </h3>
+                {/* Preset selector */}
+                <div className="mt-2 flex items-center gap-2">
+                    <label className="text-xs text-gray-500 flex-shrink-0">Defender spread:</label>
+                    <select
+                        value={presetId}
+                        onChange={e => setPresetId(e.target.value)}
+                        className="flex-1 bg-gray-800 border border-gray-700 rounded px-2 py-0.5 text-white text-xs
+                                   focus:outline-none focus:border-red-500 transition"
+                    >
+                        {PRESETS.map(p => (
+                            <option key={p.id} value={p.id}>{p.label} — {p.description}</option>
+                        ))}
+                    </select>
+                </div>
                 {ready ? (
-                    <p className="text-xs text-gray-400 mt-0.5">
+                    <p className="text-xs text-gray-400 mt-1">
                         {attacker.name} using <span className="text-white">{move.name}</span> vs. all Pokémon
-                        (Lv{attackerLevel}, 31 IVs, 0 EVs, Hardy)
+                        (Lv{attackerLevel}, 31 IVs, {preset.description})
                     </p>
                 ) : (
                     <p className="text-xs text-gray-500 mt-0.5">
