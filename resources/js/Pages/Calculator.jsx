@@ -6,6 +6,8 @@ import MoveSearch from '../Components/MoveSearch';
 import ConditionsPanel from '../Components/ConditionsPanel';
 import DamageResult from '../Components/DamageResult';
 import KoListPanel from '../Components/KoListPanel';
+import TypeCoveragePanel from '../Components/TypeCoveragePanel';
+import TypeDefensePanel from '../Components/TypeDefensePanel';
 import { calculateDamage } from '../utils/damage';
 
 const DEFAULT_IVS = { hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31 };
@@ -77,7 +79,8 @@ export default function Calculator() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
                     {/* ───── Attacker ───── */}
-                    <div className="bg-gray-900 border border-gray-700 rounded-2xl p-5 space-y-5">
+                    <div className="space-y-5">
+                        <div className="bg-gray-900 border border-gray-700 rounded-2xl p-5 space-y-5">
                         <div className="flex items-center gap-2 mb-1">
                             <span className="w-2 h-2 rounded-full bg-red-500 inline-block" />
                             <h2 className="text-base font-bold text-white">Attacker</h2>
@@ -95,6 +98,10 @@ export default function Calculator() {
                         <div className="pt-2 border-t border-gray-700">
                             <MoveSearch value={move} onChange={setMove} attackerTypes={attackerTypes} />
                         </div>
+                        </div>
+
+                        {/* Type coverage chart */}
+                        <TypeCoveragePanel move={move} />
                     </div>
 
                     {/* ───── Center: Result + Conditions ───── */}
@@ -133,7 +140,7 @@ export default function Calculator() {
                         <ConditionsPanel conditions={conditions} setConditions={setConditions} />
                     </div>
 
-                    {/* ───── Defender + KO List ───── */}
+                    {/* ───── Defender + Type Defense + KO List ───── */}
                     <div className="space-y-5">
                         <div className="bg-gray-900 border border-gray-700 rounded-2xl p-5 space-y-5">
                             <div className="flex items-center gap-2 mb-1">
@@ -149,6 +156,9 @@ export default function Calculator() {
                                 nature={defNature} setNature={setDefNature}
                             />
                         </div>
+
+                        {/* Type defense chart */}
+                        <TypeDefensePanel defender={defender} />
 
                         <KoListPanel
                             attacker={attacker}

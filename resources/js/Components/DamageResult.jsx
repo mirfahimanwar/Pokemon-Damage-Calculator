@@ -1,12 +1,12 @@
 import TypeBadge from './TypeBadge';
 
 function effLabel(eff) {
-    if (eff === 0)    return { label: 'Immune (0×)', cls: 'text-gray-400' };
-    if (eff === 0.25) return { label: 'Not very effective (¼×)', cls: 'text-orange-400' };
-    if (eff === 0.5)  return { label: 'Not very effective (½×)', cls: 'text-orange-300' };
-    if (eff === 1)    return { label: 'Normal effectiveness', cls: 'text-gray-300' };
-    if (eff === 2)    return { label: 'Super effective (2×)!', cls: 'text-green-400' };
-    if (eff === 4)    return { label: 'Super effective (4×)!!', cls: 'text-green-300 font-bold' };
+    if (eff === 0)    return { label: 'Immune (0×)',                  cls: 'text-gray-400' };
+    if (eff === 0.25) return { label: 'Mostly ineffective (¼×)',       cls: 'text-blue-300' };
+    if (eff === 0.5)  return { label: 'Not very effective (½×)',        cls: 'text-orange-300' };
+    if (eff === 1)    return { label: 'Normal effectiveness',           cls: 'text-gray-300' };
+    if (eff === 2)    return { label: 'Super effective (2×)!',          cls: 'text-green-400' };
+    if (eff === 4)    return { label: 'Extremely effective (4×)!!',     cls: 'text-red-400 font-bold' };
     return { label: `${eff}×`, cls: 'text-gray-300' };
 }
 
