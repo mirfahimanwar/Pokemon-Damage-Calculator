@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useDeferredValue } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import { calculateDamage } from '../utils/damage';
 import TypeBadge from './TypeBadge';
@@ -76,11 +76,6 @@ export default function KoListPanel({
     const [loading, setLoading]       = useState(true);
     const [filter, setFilter]         = useState('');
 
-    // Defer heavy inputs so IV/EV typing stays responsive
-    const deferredIvs    = useDeferredValue(attackerIvs);
-    const deferredEvs    = useDeferredValue(attackerEvs);
-    const deferredNature = useDeferredValue(attackerNature);
-
     // Fetch all 1,025 Pokémon once
     useEffect(() => {
         axios.get('/api/pokemon')
@@ -99,7 +94,7 @@ export default function KoListPanel({
             try {
                 const result = calculateDamage({
                     attacker,
-                    attackerIvs: deferredIvs, attackerEvs: deferredEvs, attackerNature: deferredNature, attackerLevel,
+                    attackerIvs, attackerEvs, attackerNature, attackerLevel,
                     defender: pokemon,
                     defenderIvs: DEF_IVS,
                     defenderEvs: DEF_EVS,
@@ -114,7 +109,7 @@ export default function KoListPanel({
         }
 
         return { guaranteed, possible, none };
-    }, [attacker, deferredIvs, deferredEvs, deferredNature, attackerLevel,
+    }, [attacker, attackerIvs, attackerEvs, attackerNature, attackerLevel,
         move, conditions, allPokemon, filter]);
 
     const ready = attacker && move?.power;
