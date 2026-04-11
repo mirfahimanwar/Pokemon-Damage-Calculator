@@ -158,6 +158,8 @@ export default function Calculator() {
                             attackerLevel={atkLevel}
                             move={move}
                             conditions={conditions}
+                            onSelect={setDefender}
+                            selectedDefenderId={defender?.id}
                         />
                     </div>
 

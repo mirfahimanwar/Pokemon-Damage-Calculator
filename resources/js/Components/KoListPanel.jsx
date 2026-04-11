@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useDeferredValue } from 'react';
 import axios from 'axios';
 import { calculateDamage } from '../utils/damage';
 import TypeBadge from './TypeBadge';
@@ -6,9 +6,16 @@ import TypeBadge from './TypeBadge';
 const DEF_IVS = { hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31 };
 const DEF_EVS = { hp: 0,  atk: 0,  def: 0,  spa: 0,  spd: 0,  spe: 0  };
 
-function Row({ pokemon, result }) {
+function Row({ pokemon, result, onSelect, isSelected }) {
     return (
-        <div className="flex items-center gap-2 px-3 py-1.5 border-b border-gray-800/60 last:border-0 hover:bg-gray-800/40 transition">
+        <div
+            onClick={() => onSelect?.(pokemon)}
+            className={`flex items-center gap-2 px-3 py-1.5 border-b border-gray-800/60 last:border-0 transition
+                       ${onSelect ? 'cursor-pointer' : ''}
+                       ${isSelected
+                            ? 'bg-blue-900/30 border-l-2 border-l-blue-500 hover:bg-blue-900/40'
+                            : 'hover:bg-gray-800/40'}`}
+        >
             <img
                 src={pokemon.image_url}
                 alt={pokemon.name}
@@ -30,7 +37,7 @@ function Row({ pokemon, result }) {
     );
 }
 
-function Section({ title, emoji, colorClass, items, defaultOpen }) {
+function Section({ title, emoji, colorClass, items, defaultOpen, onSelect, selectedDefenderId }) {
     const [open, setOpen] = useState(defaultOpen);
     if (items.length === 0) return null;
 
@@ -49,7 +56,13 @@ function Section({ title, emoji, colorClass, items, defaultOpen }) {
                 </span>
             </button>
             {open && items.map(({ pokemon, result }) => (
-                <Row key={pokemon.id} pokemon={pokemon} result={result} />
+                <Row
+                    key={pokemon.id}
+                    pokemon={pokemon}
+                    result={result}
+                    onSelect={onSelect}
+                    isSelected={pokemon.id === selectedDefenderId}
+                />
             ))}
         </div>
     );
@@ -57,11 +70,16 @@ function Section({ title, emoji, colorClass, items, defaultOpen }) {
 
 export default function KoListPanel({
     attacker, attackerIvs, attackerEvs, attackerNature, attackerLevel,
-    move, conditions,
+    move, conditions, onSelect, selectedDefenderId,
 }) {
     const [allPokemon, setAllPokemon] = useState([]);
     const [loading, setLoading]       = useState(true);
     const [filter, setFilter]         = useState('');
+
+    // Defer heavy inputs so IV/EV typing stays responsive
+    const deferredIvs    = useDeferredValue(attackerIvs);
+    const deferredEvs    = useDeferredValue(attackerEvs);
+    const deferredNature = useDeferredValue(attackerNature);
 
     // Fetch all 1,025 Pokémon once
     useEffect(() => {
@@ -81,7 +99,7 @@ export default function KoListPanel({
             try {
                 const result = calculateDamage({
                     attacker,
-                    attackerIvs, attackerEvs, attackerNature, attackerLevel,
+                    attackerIvs: deferredIvs, attackerEvs: deferredEvs, attackerNature: deferredNature, attackerLevel,
                     defender: pokemon,
                     defenderIvs: DEF_IVS,
                     defenderEvs: DEF_EVS,
@@ -96,7 +114,7 @@ export default function KoListPanel({
         }
 
         return { guaranteed, possible, none };
-    }, [attacker, attackerIvs, attackerEvs, attackerNature, attackerLevel,
+    }, [attacker, deferredIvs, deferredEvs, deferredNature, attackerLevel,
         move, conditions, allPokemon, filter]);
 
     const ready = attacker && move?.power;
@@ -164,16 +182,19 @@ export default function KoListPanel({
                             title="Guaranteed 1HKO" emoji="✅"
                             colorClass="text-green-400"
                             items={groups.guaranteed} defaultOpen={true}
+                            onSelect={onSelect} selectedDefenderId={selectedDefenderId}
                         />
                         <Section
                             title="Possible 1HKO" emoji="⚡"
                             colorClass="text-yellow-400"
                             items={groups.possible} defaultOpen={true}
+                            onSelect={onSelect} selectedDefenderId={selectedDefenderId}
                         />
                         <Section
                             title="Cannot 1HKO" emoji="❌"
                             colorClass="text-gray-400"
                             items={groups.none} defaultOpen={false}
+                            onSelect={onSelect} selectedDefenderId={selectedDefenderId}
                         />
                         {groups.guaranteed.length === 0 && groups.possible.length === 0 && groups.none.length === 0 && (
                             <div className="px-4 py-6 text-center text-gray-500 text-sm">
