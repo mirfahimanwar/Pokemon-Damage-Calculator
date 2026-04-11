@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             TypeSeeder::class,
             PokemonSeeder::class,
             MoveSeeder::class,
+            ItemSeeder::class,
         ]);
     }
 }

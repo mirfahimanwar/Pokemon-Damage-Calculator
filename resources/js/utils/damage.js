@@ -119,17 +119,27 @@ export function typeLabel(eff) {
 }
 
 export function calculateDamage({ attacker, attackerIvs, attackerEvs, attackerNature, attackerLevel,
+                                   attackerItem = null,
                                    defender, defenderIvs, defenderEvs, defenderNature, defenderLevel,
+                                   defenderItem = null,
                                    move, conditions }) {
     const nm = (nature, stat) => natureMod(nature, stat);
 
-    const atkStat = move.category === 'Physical'
+    const atkStatBase = move.category === 'Physical'
         ? calcStat(attacker.attack,         attackerIvs.atk, attackerEvs.atk, attackerLevel, nm(attackerNature, 'atk'))
         : calcStat(attacker.special_attack,  attackerIvs.spa, attackerEvs.spa, attackerLevel, nm(attackerNature, 'spa'));
+    const atkItemStatMod = attackerItem
+        ? (move.category === 'Physical' ? (attackerItem.stat_atk_mod ?? 1) : (attackerItem.stat_spa_mod ?? 1))
+        : 1;
+    const atkStat = Math.floor(atkStatBase * atkItemStatMod);
 
-    const defStat = move.category === 'Physical'
+    const defStatBase = move.category === 'Physical'
         ? calcStat(defender.defense,         defenderIvs.def, defenderEvs.def, defenderLevel, nm(defenderNature, 'def'))
         : calcStat(defender.special_defense, defenderIvs.spd, defenderEvs.spd, defenderLevel, nm(defenderNature, 'spd'));
+    const defItemStatMod = defenderItem
+        ? (move.category === 'Physical' ? (defenderItem.stat_def_mod ?? 1) : (defenderItem.stat_spd_mod ?? 1))
+        : 1;
+    const defStat = Math.floor(defStatBase * defItemStatMod);
 
     const defHp = calcHp(defender.hp, defenderIvs.hp, defenderEvs.hp, defenderLevel);
 
@@ -182,6 +192,19 @@ export function calculateDamage({ attacker, attackerIvs, attackerEvs, attackerNa
     // other multiplied
     const other = terrain * screen * (conditions.otherMod ?? 1);
 
+    // Attacker item damage modifiers
+    const itemDamageMod = (() => {
+        if (!attackerItem) return 1;
+        let mod = attackerItem.damage_mod ?? 1;
+        if (move.category === 'Physical') mod *= attackerItem.phys_damage_mod ?? 1;
+        else if (move.category === 'Special') mod *= attackerItem.spec_damage_mod ?? 1;
+        if (attackerItem.boost_type && attackerItem.boost_type === move.type) {
+            mod *= attackerItem.type_mod ?? 1;
+        }
+        return mod;
+    })();
+    const superEffMod = (attackerItem && typeEff > 1) ? (attackerItem.super_effective_mod ?? 1) : 1;
+
     // Calculate all 16 rolls (85/100 to 100/100)
     const rolls = [];
     for (let roll = 85; roll <= 100; roll++) {
@@ -195,6 +218,8 @@ export function calculateDamage({ attacker, attackerIvs, attackerEvs, attackerNa
         dmg = Math.floor(dmg * typeEff);
         dmg = Math.floor(dmg * burn);
         dmg = Math.floor(dmg * other);
+        dmg = Math.floor(dmg * itemDamageMod);
+        dmg = Math.floor(dmg * superEffMod);
         rolls.push(Math.max(1, dmg));
     }
 

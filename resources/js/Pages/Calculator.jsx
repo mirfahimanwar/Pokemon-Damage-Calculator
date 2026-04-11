@@ -8,6 +8,7 @@ import DamageResult from '../Components/DamageResult';
 import KoListPanel from '../Components/KoListPanel';
 import TypeCoveragePanel from '../Components/TypeCoveragePanel';
 import TypeDefensePanel from '../Components/TypeDefensePanel';
+import ItemSelect from '../Components/ItemSelect';
 import { calculateDamage } from '../utils/damage';
 
 const DEFAULT_IVS = { hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31 };
@@ -26,6 +27,7 @@ export default function Calculator() {
     const [atkIvs, setAtkIvs]             = useState({ ...DEFAULT_IVS });
     const [atkEvs, setAtkEvs]             = useState({ ...DEFAULT_EVS });
     const [atkNature, setAtkNature]       = useState('Hardy');
+    const [attackerItem, setAttackerItem] = useState(null);
 
     // Defender state
     const [defender, setDefender]         = useState(null);
@@ -33,6 +35,7 @@ export default function Calculator() {
     const [defIvs, setDefIvs]             = useState({ ...DEFAULT_IVS });
     const [defEvs, setDefEvs]             = useState({ ...DEFAULT_EVS });
     const [defNature, setDefNature]       = useState('Hardy');
+    const [defenderItem, setDefenderItem] = useState(null);
 
     // Move state
     const [move, setMove]                 = useState(null);
@@ -47,15 +50,17 @@ export default function Calculator() {
             return calculateDamage({
                 attacker, attackerIvs: atkIvs, attackerEvs: atkEvs,
                 attackerNature: atkNature, attackerLevel: atkLevel,
+                attackerItem,
                 defender, defenderIvs: defIvs, defenderEvs: defEvs,
                 defenderNature: defNature, defenderLevel: defLevel,
+                defenderItem,
                 move, conditions,
             });
         } catch {
             return null;
         }
-    }, [attacker, atkIvs, atkEvs, atkNature, atkLevel,
-        defender, defIvs, defEvs, defNature, defLevel,
+    }, [attacker, atkIvs, atkEvs, atkNature, atkLevel, attackerItem,
+        defender, defIvs, defEvs, defNature, defLevel, defenderItem,
         move, conditions]);
 
     const attackerTypes = attacker ? [attacker.type1, attacker.type2] : null;
@@ -94,6 +99,12 @@ export default function Calculator() {
                             nature={atkNature} setNature={setAtkNature}
                         />
 
+                        <ItemSelect
+                            label="Held Item"
+                            value={attackerItem}
+                            onChange={setAttackerItem}
+                        />
+
                         {/* Move selector (attacker side) */}
                         <div className="pt-2 border-t border-gray-700">
                             <MoveSearch value={move} onChange={setMove} attackerTypes={attackerTypes} />
@@ -116,6 +127,7 @@ export default function Calculator() {
                                     const tmpI = atkIvs; setAtkIvs(defIvs); setDefIvs(tmpI);
                                     const tmpE = atkEvs; setAtkEvs(defEvs); setDefEvs(tmpE);
                                     const tmpN = atkNature; setAtkNature(defNature); setDefNature(tmpN);
+                                    const tmpItem = attackerItem; setAttackerItem(defenderItem); setDefenderItem(tmpItem);
                                 }}
                                 className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg text-sm font-medium
                                            transition flex items-center gap-2"
@@ -155,6 +167,12 @@ export default function Calculator() {
                                 evs={defEvs}    setEvs={setDefEvs}
                                 nature={defNature} setNature={setDefNature}
                             />
+
+                            <ItemSelect
+                                label="Held Item"
+                                value={defenderItem}
+                                onChange={setDefenderItem}
+                            />
                         </div>
 
                         {/* Type defense chart */}
@@ -166,6 +184,7 @@ export default function Calculator() {
                             attackerEvs={atkEvs}
                             attackerNature={atkNature}
                             attackerLevel={atkLevel}
+                            attackerItem={attackerItem}
                             move={move}
                             conditions={conditions}
                             onSelect={(pokemon, evs, ivs, nature) => {

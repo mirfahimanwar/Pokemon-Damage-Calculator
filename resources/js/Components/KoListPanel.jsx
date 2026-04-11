@@ -100,6 +100,7 @@ function Section({ title, emoji, colorClass, items, defaultOpen, onSelect, selec
 
 export default function KoListPanel({
     attacker, attackerIvs, attackerEvs, attackerNature, attackerLevel,
+    attackerItem = null,
     move, conditions, onSelect, selectedDefenderId,
 }) {
     const [allPokemon, setAllPokemon] = useState([]);
@@ -128,6 +129,7 @@ export default function KoListPanel({
                 const result = calculateDamage({
                     attacker,
                     attackerIvs, attackerEvs, attackerNature, attackerLevel,
+                    attackerItem,
                     defender: pokemon,
                     defenderIvs: DEF_IVS,
                     defenderEvs: preset.evs,
@@ -142,7 +144,7 @@ export default function KoListPanel({
         }
 
         return { guaranteed, possible, none };
-    }, [attacker, attackerIvs, attackerEvs, attackerNature, attackerLevel,
+    }, [attacker, attackerIvs, attackerEvs, attackerNature, attackerLevel, attackerItem,
         move, conditions, allPokemon, filter, preset]);
 
     const ready = attacker && move?.power;
