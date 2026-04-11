@@ -212,9 +212,6 @@ export default function Calculator() {
                             />
                         </div>
 
-                        {/* Type defense chart */}
-                        <TypeDefensePanel defender={defender} />
-
                         <KoListPanel
                             attacker={attacker}
                             attackerIvs={atkIvs}
@@ -233,6 +230,9 @@ export default function Calculator() {
                             }}
                             selectedDefenderId={defender?.id}
                         />
+
+                        {/* Type defense chart */}
+                        <TypeDefensePanel defender={defender} />
                     </div>
 
                 </div>
