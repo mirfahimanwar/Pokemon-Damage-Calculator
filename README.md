@@ -1,58 +1,181 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Pokémon Damage Calculator
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A full-stack competitive damage calculator for **Pokémon Scarlet & Violet (Gen IX)**, built with Laravel, React, and Inertia.js. Search any of the 1,025 Pokémon, pick a move, configure EVs/IVs/Natures, set battle conditions, and get an instant damage range with all 16 random rolls.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Features
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- **1,025 Pokémon** with base stats and sprites sourced from [PokémonDB](https://pokemondb.net/pokedex/all)
+- **934 moves** with type, category (Physical/Special/Status), power, accuracy, PP, and effect text
+- **Gen IX damage formula** — the full Bulbapedia formula including all multipliers
+- **EV / IV / Nature** inputs with live effective-stat display (nature bonuses colour-coded red/blue)
+- **All 16 damage rolls** shown individually (85/100 → 100/100), with KO rolls highlighted
+- **Battle conditions** — weather, terrain, critical hits, burn, screens, multi-target, Glaive Rush, Adaptability, and a freeform other-modifier field
+- **Type effectiveness** display (immune / not very effective / super effective) per Gen IX chart
+- **Swap attacker ↔ defender** button
+- **STAB highlighting** in the move search results
+- Live recalculation — no submit button needed
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## Tech Stack
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+| Layer | Technology |
+|---|---|
+| Backend framework | [Laravel 12](https://laravel.com) (PHP 8.4) |
+| Frontend framework | [React 19](https://react.dev) |
+| SPA adapter | [Inertia.js v3](https://inertiajs.com) — no separate API calls for page navigation |
+| Build tool | [Vite 8](https://vitejs.dev) with `@vitejs/plugin-react` |
+| CSS | [Tailwind CSS v4](https://tailwindcss.com) |
+| Database | SQLite (zero-config, file-based) |
+| HTTP client (UI) | [Axios](https://axios-http.com) |
+| Data scraping | Node.js + [Cheerio](https://cheerio.js.org) |
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+## Requirements
 
-## Agentic Development
+- PHP >= 8.2
+- Composer
+- Node.js >= 18
+- npm
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+---
+
+## Installation
+
+### 1. Clone the repository
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+git clone https://github.com/mirfahimanwar/Pokemon-Damage-Calculator.git
+cd Pokemon-Damage-Calculator
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+### 2. Install PHP dependencies
 
-## Contributing
+```bash
+composer install
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 3. Set up the environment file
 
-## Code of Conduct
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+The default `.env.example` is pre-configured to use SQLite, so no database setup is needed.
 
-## Security Vulnerabilities
+### 4. Run migrations and seed the database
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+This creates the SQLite database and populates it with all 1,025 Pokémon and 934 moves from the bundled JSON files in `database/data/`.
 
-## License
+```bash
+php artisan migrate:fresh --seed
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### 5. Install JavaScript dependencies and build assets
+
+```bash
+npm install
+npm run build
+```
+
+### 6. Start the development server
+
+```bash
+php artisan serve
+```
+
+Visit **http://127.0.0.1:8000** in your browser.
+
+---
+
+## Development Mode (hot reload)
+
+Run Vite and Laravel simultaneously in two terminals:
+
+```bash
+# Terminal 1 — Laravel
+php artisan serve
+
+# Terminal 2 — Vite dev server with HMR
+npm run dev
+```
+
+---
+
+## Re-scraping Data (optional)
+
+The scraped JSON files are already committed. If you want to refresh the data:
+
+```bash
+# Re-scrape Pokémon base stats and image URLs
+node scripts/scrape-pokemon.mjs
+
+# Re-scrape moves
+node scripts/scrape-moves.mjs
+
+# Re-seed the database
+php artisan migrate:fresh --seed
+```
+
+---
+
+## Project Structure
+
+```
+app/
+  Http/Controllers/
+    PokemonController.php     — /api/pokemon search endpoint
+    MoveController.php        — /api/moves search endpoint
+    CalculatorController.php  — /api/calculate damage formula (server-side)
+  Models/
+    Pokemon.php
+    Move.php
+
+database/
+  data/
+    pokemon.json              — 1,025 Pokémon (scraped, committed)
+    moves.json                — 934 moves    (scraped, committed)
+  migrations/
+  seeders/
+
+resources/js/
+  Pages/
+    Calculator.jsx            — Main calculator page
+  Components/
+    PokemonSearch.jsx         — Live Pokémon search with sprites
+    MoveSearch.jsx            — Live move search with STAB indicator
+    StatPanel.jsx             — Level / Nature / EV / IV inputs
+    ConditionsPanel.jsx       — Weather, terrain, toggles
+    DamageResult.jsx          — Damage range, HP bar, rolls display
+    TypeBadge.jsx             — Coloured type pill
+  utils/
+    damage.js                 — Gen IX formula, type chart, stat calculations
+
+scripts/
+  scrape-pokemon.mjs
+  scrape-moves.mjs
+```
+
+---
+
+## Damage Formula
+
+Implements the official **Generation IX** formula from [Bulbapedia](https://bulbapedia.bulbagarden.net/wiki/Damage):
+
+$$\text{Damage} = \left(\left(\frac{\frac{2 \times \text{Level}}{5} + 2 \times \text{Power} \times \frac{A}{D}}{50}\right) + 2\right) \times \text{Targets} \times \text{Weather} \times \text{GlaiveRush} \times \text{Critical} \times \text{random} \times \text{STAB} \times \text{Type} \times \text{Burn} \times \text{other}$$
+
+All 16 random rolls (85–100) are computed and displayed individually.
+
+---
+
+## Data Sources
+
+- Pokémon base stats & sprites: [pokemondb.net/pokedex/all](https://pokemondb.net/pokedex/all)
+- Move data: [pokemondb.net/move/all](https://pokemondb.net/move/all)
+- Damage formula: [Bulbapedia — Damage](https://bulbapedia.bulbagarden.net/wiki/Damage)
+
+Pokémon and all related names are trademarks of The Pokémon Company International.
