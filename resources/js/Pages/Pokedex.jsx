@@ -73,11 +73,15 @@ export default function Pokedex() {
         }
     }
 
-    const allTypes = useMemo(() => {
-        const types = new Set();
-        pokemon.forEach(p => { if (p.type1) types.add(p.type1); if (p.type2) types.add(p.type2); });
-        return [...types].sort();
-    }, [pokemon]);
+    const typeData = useMemo(() => {
+        const pool = subTab === 'champions' ? pokemon.filter(p => isChampionsEligible(p.name)) : pokemon;
+        const counts = {};
+        pool.forEach(p => {
+            if (p.type1) counts[p.type1] = (counts[p.type1] || 0) + 1;
+            if (p.type2) counts[p.type2] = (counts[p.type2] || 0) + 1;
+        });
+        return Object.keys(counts).sort().map(t => ({ type: t, count: counts[t] }));
+    }, [pokemon, subTab]);
 
     const filtered = useMemo(() => {
         let list = pokemon;
@@ -181,7 +185,9 @@ export default function Pokedex() {
                         className="px-3 py-2 rounded-lg border border-gray-700 bg-gray-900 text-white text-sm focus:outline-none focus:border-red-500"
                     >
                         <option value="">All Types</option>
-                        {allTypes.map(t => <option key={t} value={t}>{t}</option>)}
+                        {typeData.map(({ type, count }) => (
+                            <option key={type} value={type}>{type} ({count})</option>
+                        ))}
                     </select>
                     {(search || typeFilter) && (
                         <button
