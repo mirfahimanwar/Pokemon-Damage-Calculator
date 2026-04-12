@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 
-export default function ItemSelect({ value, onChange, label = 'Held Item' }) {
+export default function ItemSelect({ value, onChange, label = 'Held Item', championsOnly = false }) {
     const [items, setItems]   = useState([]);
     const [search, setSearch] = useState('');
     const [open, setOpen]     = useState(false);
@@ -12,6 +12,13 @@ export default function ItemSelect({ value, onChange, label = 'Held Item' }) {
         axios.get('/api/items').then(r => setItems(r.data));
     }, []);
 
+    // Clear selection if selected item is no longer in the filtered set
+    useEffect(() => {
+        if (value && championsOnly && !value.is_champions) {
+            onChange(null);
+        }
+    }, [championsOnly]);
+
     // Close dropdown on outside click
     useEffect(() => {
         const handle = (e) => {
@@ -21,11 +28,13 @@ export default function ItemSelect({ value, onChange, label = 'Held Item' }) {
         return () => document.removeEventListener('mousedown', handle);
     }, []);
 
+    const pool = championsOnly ? items.filter(i => i.is_champions) : items;
+
     const filtered = search
-        ? items.filter(i =>
+        ? pool.filter(i =>
             i.name.toLowerCase().includes(search.toLowerCase()) ||
             i.category.toLowerCase().includes(search.toLowerCase()))
-        : items;
+        : pool;
 
     // Group by category (preserving server order)
     const groups = [];

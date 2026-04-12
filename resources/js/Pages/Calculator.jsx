@@ -115,6 +115,7 @@ export default function Calculator() {
                             label="Held Item"
                             value={attackerItem}
                             onChange={setAttackerItem}
+                            championsOnly={championsOnly}
                         />
 
                         {/* Move selector (attacker side) */}
@@ -217,6 +218,7 @@ export default function Calculator() {
                                 label="Held Item"
                                 value={defenderItem}
                                 onChange={setDefenderItem}
+                                championsOnly={championsOnly}
                             />
                         </div>
 
