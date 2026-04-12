@@ -29,7 +29,7 @@ export const CHAMPIONS_ELIGIBLE_NAMES = new Set([
     'Volcarona',
     'Chesnaught', 'Delphox', 'Greninja', 'Diggersby', 'Talonflame',
     'Vivillon', 'Floette', 'Florges', 'Pangoro', 'Furfrou',
-    'Meowstic', 'Aegislash', 'Aromatisse', 'Slurpuff', 'Clawitzer',
+    'Meowstic', 'Aegislash (Shield Form)', 'Aegislash (Blade Form)', 'Aromatisse', 'Slurpuff', 'Clawitzer',
     'Heliolisk', 'Tyrantrum', 'Aurorus', 'Sylveon', 'Hawlucha',
     'Dedenne', 'Goodra', 'Klefki', 'Trevenant', 'Gourgeist',
     'Avalugg', 'Noivern',
