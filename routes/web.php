@@ -7,3 +7,7 @@ Route::get('/', function () {
     return Inertia::render('Calculator');
 });
 
+Route::get('/pokedex', function () {
+    return Inertia::render('Pokedex');
+});
+
