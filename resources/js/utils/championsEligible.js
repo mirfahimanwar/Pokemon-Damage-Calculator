@@ -46,6 +46,7 @@ export const CHAMPIONS_ELIGIBLE_NAMES = new Set([
     'Espathra', 'Tinkaton', 'Palafin', 'Orthworm', 'Glimmora',
     'Farigiraf', 'Kingambit',
     'Sinistcha', 'Archaludon', 'Hydrapple',
+    'Pawmot',
 ]);
 
 /** Returns true if the given Pokémon name is eligible for Pokémon Champions. */
