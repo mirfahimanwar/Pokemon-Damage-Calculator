@@ -205,6 +205,14 @@ export function calculateDamage({ attacker, attackerIvs, attackerEvs, attackerNa
     })();
     const superEffMod = (attackerItem && typeEff > 1) ? (attackerItem.super_effective_mod ?? 1) : 1;
 
+    // Defender resistance berry: halves damage when move type matches berry type
+    // (Chilan Berry halves Normal regardless; all others halve super-effective hits of their type)
+    const berryMod = (() => {
+        if (!defenderItem || defenderItem.category !== 'Resistance Berries') return 1;
+        if (defenderItem.boost_type && defenderItem.boost_type === move.type) return 0.5;
+        return 1;
+    })();
+
     // Calculate all 16 rolls (85/100 to 100/100)
     const rolls = [];
     for (let roll = 85; roll <= 100; roll++) {
@@ -220,6 +228,7 @@ export function calculateDamage({ attacker, attackerIvs, attackerEvs, attackerNa
         dmg = Math.floor(dmg * other);
         dmg = Math.floor(dmg * itemDamageMod);
         dmg = Math.floor(dmg * superEffMod);
+        dmg = Math.floor(dmg * berryMod);
         rolls.push(Math.max(1, dmg));
     }
 
