@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { NATURES, NATURE_EFFECTS, getEffectiveStats } from '../utils/damage';
+import { NATURES, NATURE_EFFECTS, getEffectiveStats, statStageMod } from '../utils/damage';
 
 const STAGE_STATS = [
     { key: 'atk', label: 'Atk' },
@@ -147,8 +147,17 @@ export default function StatPanel({ pokemon, level, setLevel, ivs, setIvs, evs, 
                                     className="bg-gray-900 border border-gray-700 rounded px-1 py-0.5 text-white text-xs text-center w-full
                                                focus:outline-none focus:border-red-500"
                                 />
-                                <span className={`text-center text-xs font-bold ${statColor(key)}`}>
-                                    {effective ? effective[key] : '—'}
+                <span className={`text-center text-xs font-bold
+                                    ${ key === 'hp'
+                                        ? statColor(key)
+                                        : (stages[key] ?? 0) > 0 ? 'text-red-400'
+                                        : (stages[key] ?? 0) < 0 ? 'text-blue-400'
+                                        : statColor(key) }`}>
+                                    {effective
+                                        ? key === 'hp'
+                                            ? effective[key]
+                                            : Math.floor(effective[key] * statStageMod(stages[key] ?? 0))
+                                        : '—'}
                                 </span>
                             </div>
                         );

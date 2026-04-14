@@ -9,6 +9,7 @@ import KoListPanel from '../Components/KoListPanel';
 import TypeCoveragePanel from '../Components/TypeCoveragePanel';
 import TypeDefensePanel from '../Components/TypeDefensePanel';
 import ItemSelect from '../Components/ItemSelect';
+import SetupMoveSelect from '../Components/SetupMoveSelect';
 import { calculateDamage } from '../utils/damage';
 
 const DEFAULT_IVS = { hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31 };
@@ -125,6 +126,11 @@ export default function Calculator() {
                         <div className="pt-2 border-t border-gray-700">
                             <MoveSearch value={move} onChange={setMove} attackerTypes={attackerTypes} />
                         </div>
+
+                        <SetupMoveSelect
+                            atkStages={atkStages} setAtkStages={setAtkStages}
+                            defStages={defStages} setDefStages={setDefStages}
+                        />
                         </div>
 
                         {/* Type coverage chart */}
