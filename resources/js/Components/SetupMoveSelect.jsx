@@ -49,47 +49,57 @@ function mergeStages(current, delta) {
     return next;
 }
 
+import { useState } from 'react';
+
+const CLEAR_STAGES = { atk: 0, def: 0, spa: 0, spd: 0, spe: 0 };
+
 export default function SetupMoveSelect({ atkStages, setAtkStages, defStages, setDefStages }) {
-    function apply(move) {
-        if (!move) return;
-        if (Object.keys(move.self).length)
-            setAtkStages(prev => mergeStages(prev, move.self));
-        if (Object.keys(move.foe).length)
-            setDefStages(prev => mergeStages(prev, move.foe));
+    const [selectedIdx, setSelectedIdx] = useState('');
+
+    function apply(idx) {
+        const move = SETUP_MOVES[parseInt(idx)];
+        if (!move) {
+            // "None" selected — clear everything
+            setAtkStages({ ...CLEAR_STAGES });
+            setDefStages({ ...CLEAR_STAGES });
+            setSelectedIdx('');
+            return;
+        }
+        // Reset all stages first, then apply only this move's effect
+        const newAtk = mergeStages({ ...CLEAR_STAGES }, move.self);
+        const newDef = mergeStages({ ...CLEAR_STAGES }, move.foe);
+        setAtkStages(newAtk);
+        setDefStages(newDef);
+        setSelectedIdx(idx);
     }
 
     function reset() {
-        setAtkStages({ atk: 0, def: 0, spa: 0, spd: 0, spe: 0 });
-        setDefStages({ atk: 0, def: 0, spa: 0, spd: 0, spe: 0 });
+        setAtkStages({ ...CLEAR_STAGES });
+        setDefStages({ ...CLEAR_STAGES });
+        setSelectedIdx('');
     }
-
-    const hasStages = (s) => Object.values(s).some(v => v !== 0);
 
     return (
         <div className="pt-2 border-t border-gray-700 space-y-2">
             <div className="flex items-center gap-2">
                 <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Setup Move</label>
-                {(hasStages(atkStages) || hasStages(defStages)) && (
+                {selectedIdx !== '' && (
                     <button
                         type="button"
                         onClick={reset}
                         className="text-xs text-gray-500 hover:text-red-400 underline ml-auto"
                     >
-                        Reset all stages
+                        Clear
                     </button>
                 )}
             </div>
             <select
-                defaultValue=""
-                onChange={e => {
-                    const idx = parseInt(e.target.value);
-                    if (!isNaN(idx)) apply(SETUP_MOVES[idx]);
-                    e.target.value = '';
-                }}
+                value={selectedIdx}
+                onChange={e => apply(e.target.value)}
                 className="w-full bg-gray-800 border border-gray-600 rounded px-2 py-1 text-white text-sm
                            focus:outline-none focus:border-red-500"
             >
-                <option value="">Apply a setup / debuff move…</option>
+                <option value="">— None (no setup) —</option>
                 {SETUP_MOVES.map((m, i) => (
                     <option key={i} value={i}>{m.label}</option>
                 ))}
