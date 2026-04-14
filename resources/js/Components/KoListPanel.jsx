@@ -102,6 +102,7 @@ function Section({ title, emoji, colorClass, items, defaultOpen, onSelect, selec
 export default function KoListPanel({
     attacker, attackerIvs, attackerEvs, attackerNature, attackerLevel,
     attackerItem = null,
+    attackerStages = {},
     championsOnly = false,
     move, conditions, onSelect, selectedDefenderId,
 }) {
@@ -133,6 +134,7 @@ export default function KoListPanel({
                     attacker,
                     attackerIvs, attackerEvs, attackerNature, attackerLevel,
                     attackerItem,
+                    attackerStages,
                     defender: pokemon,
                     defenderIvs: DEF_IVS,
                     defenderEvs: preset.evs,
@@ -148,7 +150,7 @@ export default function KoListPanel({
 
         return { guaranteed, possible, none };
     }, [attacker, attackerIvs, attackerEvs, attackerNature, attackerLevel, attackerItem,
-        championsOnly, move, conditions, allPokemon, filter, preset]);
+        attackerStages, championsOnly, move, conditions, allPokemon, filter, preset]);
 
     const ready = attacker && move?.power;
 

@@ -240,6 +240,7 @@ export default function Calculator() {
                             attackerNature={atkNature}
                             attackerLevel={atkLevel}
                             attackerItem={attackerItem}
+                            attackerStages={atkStages}
                             championsOnly={championsOnly}
                             move={move}
                             conditions={conditions}
