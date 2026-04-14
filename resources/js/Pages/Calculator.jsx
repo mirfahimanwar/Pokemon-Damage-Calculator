@@ -28,6 +28,7 @@ export default function Calculator() {
     const [atkEvs, setAtkEvs]             = useState({ ...DEFAULT_EVS });
     const [atkNature, setAtkNature]       = useState('Hardy');
     const [attackerItem, setAttackerItem] = useState(null);
+    const [atkStages, setAtkStages]       = useState({ atk:0, def:0, spa:0, spd:0, spe:0 });
 
     // Defender state
     const [defender, setDefender]         = useState(null);
@@ -36,6 +37,7 @@ export default function Calculator() {
     const [defEvs, setDefEvs]             = useState({ ...DEFAULT_EVS });
     const [defNature, setDefNature]       = useState('Hardy');
     const [defenderItem, setDefenderItem] = useState(null);
+    const [defStages, setDefStages]       = useState({ atk:0, def:0, spa:0, spd:0, spe:0 });
 
     // Move state
     const [move, setMove]                 = useState(null);
@@ -53,17 +55,17 @@ export default function Calculator() {
             return calculateDamage({
                 attacker, attackerIvs: atkIvs, attackerEvs: atkEvs,
                 attackerNature: atkNature, attackerLevel: atkLevel,
-                attackerItem,
+                attackerItem, attackerStages: atkStages,
                 defender, defenderIvs: defIvs, defenderEvs: defEvs,
                 defenderNature: defNature, defenderLevel: defLevel,
-                defenderItem,
+                defenderItem, defenderStages: defStages,
                 move, conditions,
             });
         } catch {
             return null;
         }
-    }, [attacker, atkIvs, atkEvs, atkNature, atkLevel, attackerItem,
-        defender, defIvs, defEvs, defNature, defLevel, defenderItem,
+    }, [attacker, atkIvs, atkEvs, atkNature, atkLevel, attackerItem, atkStages,
+        defender, defIvs, defEvs, defNature, defLevel, defenderItem, defStages,
         move, conditions]);
 
     const attackerTypes = attacker ? [attacker.type1, attacker.type2] : null;
@@ -109,6 +111,7 @@ export default function Calculator() {
                             ivs={atkIvs}    setIvs={setAtkIvs}
                             evs={atkEvs}    setEvs={setAtkEvs}
                             nature={atkNature} setNature={setAtkNature}
+                            stages={atkStages} setStages={setAtkStages}
                         />
 
                         <ItemSelect
@@ -141,6 +144,7 @@ export default function Calculator() {
                                     const tmpE = atkEvs; setAtkEvs(defEvs); setDefEvs(tmpE);
                                     const tmpN = atkNature; setAtkNature(defNature); setDefNature(tmpN);
                                     const tmpItem = attackerItem; setAttackerItem(defenderItem); setDefenderItem(tmpItem);
+                                    const tmpStages = atkStages; setAtkStages(defStages); setDefStages(tmpStages);
                                 }}
                                 className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg text-sm font-medium
                                            transition flex items-center gap-2"
@@ -212,6 +216,7 @@ export default function Calculator() {
                                 ivs={defIvs}    setIvs={setDefIvs}
                                 evs={defEvs}    setEvs={setDefEvs}
                                 nature={defNature} setNature={setDefNature}
+                                stages={defStages} setStages={setDefStages}
                             />
 
                             <ItemSelect

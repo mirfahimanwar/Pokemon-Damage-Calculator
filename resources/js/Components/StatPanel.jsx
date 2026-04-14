@@ -1,6 +1,14 @@
 import { useMemo } from 'react';
 import { NATURES, NATURE_EFFECTS, getEffectiveStats } from '../utils/damage';
 
+const STAGE_STATS = [
+    { key: 'atk', label: 'Atk' },
+    { key: 'def', label: 'Def' },
+    { key: 'spa', label: 'SpA' },
+    { key: 'spd', label: 'SpD' },
+    { key: 'spe', label: 'Spe' },
+];
+
 const STATS = [
     { key: 'hp',  label: 'HP',      ivKey: 'hp',  evKey: 'hp' },
     { key: 'atk', label: 'Attack',  ivKey: 'atk', evKey: 'atk' },
@@ -10,7 +18,10 @@ const STATS = [
     { key: 'spe', label: 'Speed',   ivKey: 'spe', evKey: 'spe' },
 ];
 
-export default function StatPanel({ pokemon, level, setLevel, ivs, setIvs, evs, setEvs, nature, setNature }) {
+export default function StatPanel({ pokemon, level, setLevel, ivs, setIvs, evs, setEvs, nature, setNature, stages = {}, setStages = () => {} }) {
+    function adjustStage(key, delta) {
+        setStages(prev => ({ ...prev, [key]: Math.max(-6, Math.min(6, (prev[key] ?? 0) + delta)) }));
+    }
     const effective = useMemo(() => {
         if (!pokemon) return null;
         return getEffectiveStats(pokemon, ivs, evs, nature, level);
@@ -67,6 +78,37 @@ export default function StatPanel({ pokemon, level, setLevel, ivs, setIvs, evs, 
                         return <option key={n} value={n}>{label}</option>;
                     })}
                 </select>
+            </div>
+
+            {/* Stat Stages */}
+            <div className="flex items-start gap-3">
+                <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider w-16 pt-1">Stages</label>
+                <div className="flex gap-2 flex-wrap">
+                    {STAGE_STATS.map(({ key, label }) => {
+                        const val = stages[key] ?? 0;
+                        return (
+                            <div key={key} className="flex flex-col items-center gap-0.5">
+                                <button
+                                    type="button"
+                                    onClick={() => adjustStage(key, 1)}
+                                    disabled={val >= 6}
+                                    className="w-6 h-5 text-xs bg-gray-700 hover:bg-gray-600 disabled:opacity-30 rounded text-white leading-none"
+                                >+</button>
+                                <span className={`text-xs font-bold w-6 text-center
+                                    ${val > 0 ? 'text-red-400' : val < 0 ? 'text-blue-400' : 'text-gray-500'}`}>
+                                    {val > 0 ? `+${val}` : val}
+                                </span>
+                                <button
+                                    type="button"
+                                    onClick={() => adjustStage(key, -1)}
+                                    disabled={val <= -6}
+                                    className="w-6 h-5 text-xs bg-gray-700 hover:bg-gray-600 disabled:opacity-30 rounded text-white leading-none"
+                                >−</button>
+                                <span className="text-xs text-gray-500">{label}</span>
+                            </div>
+                        );
+                    })}
+                </div>
             </div>
 
             {/* Stats table */}

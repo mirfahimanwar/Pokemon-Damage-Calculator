@@ -118,10 +118,17 @@ export function typeLabel(eff) {
     return `${eff}x`;
 }
 
+// Stage multiplier: stage in [-6, +6]
+export function statStageMod(stage) {
+    const s = Math.max(-6, Math.min(6, stage || 0));
+    if (s >= 0) return (2 + s) / 2;
+    return 2 / (2 - s);
+}
+
 export function calculateDamage({ attacker, attackerIvs, attackerEvs, attackerNature, attackerLevel,
-                                   attackerItem = null,
+                                   attackerItem = null, attackerStages = {},
                                    defender, defenderIvs, defenderEvs, defenderNature, defenderLevel,
-                                   defenderItem = null,
+                                   defenderItem = null, defenderStages = {},
                                    move, conditions }) {
     const nm = (nature, stat) => natureMod(nature, stat);
 
@@ -131,7 +138,8 @@ export function calculateDamage({ attacker, attackerIvs, attackerEvs, attackerNa
     const atkItemStatMod = attackerItem
         ? (move.category === 'Physical' ? (attackerItem.stat_atk_mod ?? 1) : (attackerItem.stat_spa_mod ?? 1))
         : 1;
-    const atkStat = Math.floor(atkStatBase * atkItemStatMod);
+    const atkStageKey = move.category === 'Physical' ? 'atk' : 'spa';
+    const atkStat = Math.floor(atkStatBase * atkItemStatMod * statStageMod(attackerStages[atkStageKey] ?? 0));
 
     const defStatBase = move.category === 'Physical'
         ? calcStat(defender.defense,         defenderIvs.def, defenderEvs.def, defenderLevel, nm(defenderNature, 'def'))
@@ -139,7 +147,8 @@ export function calculateDamage({ attacker, attackerIvs, attackerEvs, attackerNa
     const defItemStatMod = defenderItem
         ? (move.category === 'Physical' ? (defenderItem.stat_def_mod ?? 1) : (defenderItem.stat_spd_mod ?? 1))
         : 1;
-    const defStat = Math.floor(defStatBase * defItemStatMod);
+    const defStageKey = move.category === 'Physical' ? 'def' : 'spd';
+    const defStat = Math.floor(defStatBase * defItemStatMod * statStageMod(defenderStages[defStageKey] ?? 0));
 
     const defHp = calcHp(defender.hp, defenderIvs.hp, defenderEvs.hp, defenderLevel);
 
