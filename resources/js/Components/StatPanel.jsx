@@ -58,9 +58,14 @@ export default function StatPanel({ pokemon, level, setLevel, ivs, setIvs, evs, 
                     className="flex-1 bg-gray-800 border border-gray-600 rounded px-2 py-1 text-white text-sm
                                focus:outline-none focus:border-red-500"
                 >
-                    {NATURES.map(n => (
-                        <option key={n} value={n}>{n}</option>
-                    ))}
+                    {NATURES.map(n => {
+                        const e = NATURE_EFFECTS[n];
+                        const STAT_LABEL = { atk: 'Attack', def: 'Defense', spa: 'Sp. Atk', spd: 'Sp. Def', spe: 'Speed' };
+                        const label = e
+                            ? `${n} (${STAT_LABEL[e.up]} ↑, ${STAT_LABEL[e.down]} ↓)`
+                            : n;
+                        return <option key={n} value={n}>{label}</option>;
+                    })}
                 </select>
             </div>
 
