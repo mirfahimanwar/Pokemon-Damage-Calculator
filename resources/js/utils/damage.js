@@ -205,8 +205,8 @@ export function calculateDamage({ attacker, attackerIvs, attackerEvs, attackerNa
     })();
     const superEffMod = (attackerItem && typeEff > 1) ? (attackerItem.super_effective_mod ?? 1) : 1;
 
-    // Defender resistance berry: halves damage when move type matches berry type
-    // (Chilan Berry halves Normal regardless; all others halve super-effective hits of their type)
+    // Defender resistance berry: halves damage when move type matches berry's type.
+    // Chilan Berry reduces Normal damage always; typed berries reduce their type always.
     const berryMod = (() => {
         if (!defenderItem || defenderItem.category !== 'Resistance Berries') return 1;
         if (defenderItem.boost_type && defenderItem.boost_type === move.type) return 0.5;
