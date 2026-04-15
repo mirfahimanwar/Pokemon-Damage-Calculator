@@ -21,6 +21,7 @@ const SETUP_MOVES = [
     { label: 'Curse / non-Ghost (+1 Atk +1 Def −1 Spe)',
                                                    self: { atk:  1, def:  1, spe: -1 }, foe: {} },
     { label: 'Iron Defense (+2 Def)',              self: { def:  2 }, foe: {} },
+    { label: 'Cotton Guard (+3 Def)',              self: { def:  3 }, foe: {} },
     { label: 'Amnesia (+2 SpD)',                   self: { spd:  2 }, foe: {} },
     { label: 'Cosmic Power (+1 Def +1 SpD)',       self: { def:  1, spd:  1 }, foe: {} },
     { label: 'Tidy Up (+1 Atk +1 Spe)',            self: { atk:  1, spe:  1 }, foe: {} },
