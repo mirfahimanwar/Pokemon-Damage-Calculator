@@ -148,6 +148,11 @@ export default function KoListPanel({
             } catch { /* immune / status move — skip */ }
         }
 
+        const byMaxDesc = (a, b) => parseFloat(b.result.maxPercent) - parseFloat(a.result.maxPercent);
+        guaranteed.sort(byMaxDesc);
+        possible.sort(byMaxDesc);
+        none.sort(byMaxDesc);
+
         return { guaranteed, possible, none };
     }, [attacker, attackerIvs, attackerEvs, attackerNature, attackerLevel, attackerItem,
         attackerStages, championsOnly, move, conditions, allPokemon, filter, preset]);
