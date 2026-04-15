@@ -34,7 +34,10 @@ const SETUP_MOVES = [
     { label: 'No Retreat (+1 Atk +1 Def +1 SpA +1 SpD +1 Spe)',
                                                    self: { atk:  1, def:  1, spa:  1, spd:  1, spe:  1 }, foe: {} },
     { label: 'Clangorous Soul (+1 all)',           self: { atk:  1, def:  1, spa:  1, spd:  1, spe:  1 }, foe: {} },
-    // ── Opponent-lowering (foe) ───────────────────────────────────────
+    // ── Opponent-lowering / screens (foe) ────────────────────────────
+    { label: 'Reflect (foe eff. +2 Def)',          self: {}, foe: { def:  2 } },
+    { label: 'Light Screen (foe eff. +2 SpD)',     self: {}, foe: { spd:  2 } },
+    { label: 'Aurora Veil (foe eff. +2 Def +2 SpD)',self:{}, foe: { def:  2, spd:  2 } },
     { label: 'Screech (foe −2 Def)',               self: {}, foe: { def: -2 } },
     { label: 'Leer (foe −1 Def)',                  self: {}, foe: { def: -1 } },
     { label: 'Tail Whip (foe −1 Def)',             self: {}, foe: { def: -1 } },
