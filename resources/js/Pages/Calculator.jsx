@@ -17,7 +17,7 @@ const DEFAULT_EVS = { hp: 0,  atk: 0,  def: 0,  spa: 0,  spd: 0,  spe: 0  };
 const DEFAULT_CONDITIONS = {
     weather: 'none', terrain: 'none',
     critical: false, adaptability: false, burn: false,
-    multiTarget: false, glaiveRush: false, screen: false,
+    multiTarget: false, glaiveRush: false, reflect: false, lightScreen: false, auroraVeil: false,
     attackerGrounded: true, otherMod: 1,
 };
 

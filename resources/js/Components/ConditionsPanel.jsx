@@ -69,7 +69,9 @@ export default function ConditionsPanel({ conditions, setConditions }) {
                 <Toggle label="Burned Attacker" sub="½ physical damage" checked={conditions.burn} onChange={v => set('burn', v)} />
                 <Toggle label="Multi-Target" sub="0.75× in doubles" checked={conditions.multiTarget} onChange={v => set('multiTarget', v)} />
                 <Toggle label="Glaive Rush" sub="Defender used Glaive Rush" checked={conditions.glaiveRush} onChange={v => set('glaiveRush', v)} />
-                <Toggle label="Screen Active" sub="Reflect / Light Screen" checked={conditions.screen} onChange={v => set('screen', v)} />
+                <Toggle label="Reflect" sub="½× Physical damage taken" checked={conditions.reflect} onChange={v => { set('reflect', v); if (v) { set('lightScreen', false); set('auroraVeil', false); } }} />
+                <Toggle label="Light Screen" sub="½× Special damage taken" checked={conditions.lightScreen} onChange={v => { set('lightScreen', v); if (v) { set('reflect', false); set('auroraVeil', false); } }} />
+                <Toggle label="Aurora Veil" sub="½× all damage taken" checked={conditions.auroraVeil} onChange={v => { set('auroraVeil', v); if (v) { set('reflect', false); set('lightScreen', false); } }} />
                 <Toggle label="Attacker Not Grounded" sub="Ignores terrain boost" checked={!conditions.attackerGrounded} onChange={v => set('attackerGrounded', !v)} />
             </div>
 

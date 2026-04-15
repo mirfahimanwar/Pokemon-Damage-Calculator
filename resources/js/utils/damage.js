@@ -195,8 +195,15 @@ export function calculateDamage({ attacker, attackerIvs, attackerEvs, attackerNa
         if (conditions.terrain === 'misty'    && move.type === 'Dragon')  terrain = 0.5;
     }
 
-    // Screen (Light Screen / Reflect) - halves damage
-    const screen = conditions.screen ? 0.5 : 1;
+    // Screens - halve damage by move category
+    let screen = 1;
+    if (conditions.auroraVeil) {
+        screen = 0.5;
+    } else if (move.category === 'Physical' && conditions.reflect) {
+        screen = 0.5;
+    } else if (move.category === 'Special' && conditions.lightScreen) {
+        screen = 0.5;
+    }
 
     // other multiplied
     const other = terrain * screen * (conditions.otherMod ?? 1);
