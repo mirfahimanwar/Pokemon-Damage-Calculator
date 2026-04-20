@@ -1,5 +1,6 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { NATURES, NATURE_EFFECTS, getEffectiveStats, statStageMod } from '../utils/damage';
+import { isChampionsEligible } from '../utils/championsEligible';
 
 const STAGE_STATS = [
     { key: 'atk', label: 'Atk' },
@@ -18,7 +19,8 @@ const STATS = [
     { key: 'spe', label: 'Speed',   ivKey: 'spe', evKey: 'spe' },
 ];
 
-export default function StatPanel({ pokemon, level, setLevel, ivs, setIvs, evs, setEvs, nature, setNature, stages = {}, setStages = () => {} }) {
+export default function StatPanel({ pokemon, level, setLevel, ivs, setIvs, evs, setEvs, nature, setNature, stages = {}, setStages = () => {}, allPokemon = [], championsOnly = false }) {
+    const [includeEvsIvs, setIncludeEvsIvs] = useState(false);
     function adjustStage(key, delta) {
         setStages(prev => ({ ...prev, [key]: Math.max(-6, Math.min(6, (prev[key] ?? 0) + delta)) }));
     }
@@ -37,6 +39,45 @@ export default function StatPanel({ pokemon, level, setLevel, ivs, setIvs, evs, 
         const total = Object.values({ ...evs, [key]: n }).reduce((a, b) => a + b, 0);
         if (total <= 510) setEvs(prev => ({ ...prev, [key]: n }));
     }
+
+    // Compute stat ranks across eligible pokemon (base stats only, or with max IVs/EVs)
+    const statRanks = useMemo(() => {
+        if (!pokemon || allPokemon.length === 0) return {};
+        const pool = championsOnly ? allPokemon.filter(isChampionsEligible) : allPokemon;
+        const ranks = {};
+        for (const { key } of STATS) {
+            const getVal = (p) => {
+                if (!includeEvsIvs) {
+                    return key === 'hp' ? p.hp
+                        : key === 'atk' ? p.attack
+                        : key === 'def' ? p.defense
+                        : key === 'spa' ? p.special_attack
+                        : key === 'spd' ? p.special_defense
+                        : p.speed;
+                }
+                // With perfect IVs/EVs at the current level
+                const perfIvs = { hp:31, atk:31, def:31, spa:31, spd:31, spe:31 };
+                const perfEvs = { hp:252, atk:252, def:252, spa:252, spd:252, spe:252 };
+                const eff = getEffectiveStats(p, perfIvs, perfEvs, 'Hardy', level);
+                return eff[key];
+            };
+            const currentVal = includeEvsIvs
+                ? (effective ? effective[key] : null)
+                : (key === 'hp' ? pokemon.hp
+                    : key === 'atk' ? pokemon.attack
+                    : key === 'def' ? pokemon.defense
+                    : key === 'spa' ? pokemon.special_attack
+                    : key === 'spd' ? pokemon.special_defense
+                    : pokemon.speed);
+            if (currentVal == null) { ranks[key] = null; continue; }
+            const sorted = pool.map(getVal).sort((a, b) => b - a);
+            // rank = first index where sorted value <= currentVal
+            let rank = sorted.findIndex(v => v <= currentVal) + 1;
+            if (rank === 0) rank = sorted.length;
+            ranks[key] = { rank, total: pool.length };
+        }
+        return ranks;
+    }, [pokemon, allPokemon, championsOnly, includeEvsIvs, effective]);
 
     const natureEffect = NATURE_EFFECTS[nature] || {};
 
@@ -114,12 +155,31 @@ export default function StatPanel({ pokemon, level, setLevel, ivs, setIvs, evs, 
             {/* Stats table */}
             {pokemon && (
                 <div className="mt-2">
-                    <div className="grid grid-cols-5 gap-1 text-xs text-gray-400 font-semibold uppercase tracking-wide mb-1 px-1">
+                    <div className="grid gap-1 text-xs text-gray-400 font-semibold uppercase tracking-wide mb-1 px-1"
+                         style={{ gridTemplateColumns: '3fr 2fr 2fr 2fr 2fr 3fr' }}>
                         <span>Stat</span>
                         <span className="text-center">Base</span>
                         <span className="text-center">IV</span>
                         <span className="text-center">EV</span>
                         <span className="text-center">Final</span>
+                        <span className="text-center flex items-center justify-center gap-1">
+                            <button
+                                type="button"
+                                title={includeEvsIvs ? 'Ranking with max IVs/EVs (click to use base stats)' : 'Ranking by base stat (click to include IVs/EVs)'}
+                                onClick={() => setIncludeEvsIvs(v => !v)}
+                                className={`flex items-center gap-1 px-1.5 py-0.5 rounded text-xs font-semibold transition border
+                                    ${ includeEvsIvs
+                                        ? 'bg-red-700/60 border-red-500 text-red-200'
+                                        : 'bg-gray-700 border-gray-600 text-gray-400 hover:border-gray-400' }`}
+                            >
+                                {includeEvsIvs && (
+                                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 12 12">
+                                        <path d="M10 3L5 9 2 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+                                    </svg>
+                                )}
+                                Rank
+                            </button>
+                        </span>
                     </div>
                     {STATS.map(({ key, label, ivKey, evKey }) => {
                         const base = key === 'hp' ? pokemon.hp
@@ -129,8 +189,11 @@ export default function StatPanel({ pokemon, level, setLevel, ivs, setIvs, evs, 
                             : key === 'spd' ? pokemon.special_defense
                             : pokemon.speed;
 
+                        const rankInfo = statRanks[key];
+
                         return (
-                            <div key={key} className="grid grid-cols-5 gap-1 items-center mb-1">
+                            <div key={key} className="grid gap-1 items-center mb-1"
+                                 style={{ gridTemplateColumns: '3fr 2fr 2fr 2fr 2fr 3fr' }}>
                                 <span className={`text-xs font-semibold ${statColor(key)}`}>{label}</span>
                                 <span className="text-center text-gray-300 text-xs">{base}</span>
                                 <input
@@ -158,6 +221,18 @@ export default function StatPanel({ pokemon, level, setLevel, ivs, setIvs, evs, 
                                             ? effective[key]
                                             : Math.floor(effective[key] * statStageMod(stages[key] ?? 0))
                                         : '—'}
+                                </span>
+                                <span className="text-center text-xs text-gray-400">
+                                    {rankInfo ? (
+                                        <span className={`font-semibold ${
+                                            rankInfo.rank === 1 ? 'text-yellow-400'
+                                            : rankInfo.rank <= 10 ? 'text-green-400'
+                                            : rankInfo.rank <= Math.ceil(rankInfo.total * 0.25) ? 'text-blue-400'
+                                            : 'text-gray-400'
+                                        }`}>
+                                            #{rankInfo.rank}/{rankInfo.total}
+                                        </span>
+                                    ) : '—'}
                                 </span>
                             </div>
                         );

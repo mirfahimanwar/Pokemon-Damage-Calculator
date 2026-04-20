@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import axios from 'axios';
 import { Head, Link } from '@inertiajs/react';
 import PokemonSearch from '../Components/PokemonSearch';
 import StatPanel from '../Components/StatPanel';
@@ -48,6 +49,12 @@ export default function Calculator() {
 
     // Event filter
     const [championsOnly, setChampionsOnly] = useState(false);
+
+    // All pokemon for stat ranking
+    const [allPokemon, setAllPokemon] = useState([]);
+    useEffect(() => {
+        axios.get('/api/pokemon').then(r => setAllPokemon(r.data)).catch(() => {});
+    }, []);
 
     // Compute result live
     const result = useMemo(() => {
@@ -113,6 +120,8 @@ export default function Calculator() {
                             evs={atkEvs}    setEvs={setAtkEvs}
                             nature={atkNature} setNature={setAtkNature}
                             stages={atkStages} setStages={setAtkStages}
+                            allPokemon={allPokemon}
+                            championsOnly={championsOnly}
                         />
 
                         <ItemSelect
@@ -223,6 +232,8 @@ export default function Calculator() {
                                 evs={defEvs}    setEvs={setDefEvs}
                                 nature={defNature} setNature={setDefNature}
                                 stages={defStages} setStages={setDefStages}
+                                allPokemon={allPokemon}
+                                championsOnly={championsOnly}
                             />
 
                             <ItemSelect
